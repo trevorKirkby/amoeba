@@ -1,0 +1,149 @@
+constants:
+  cubes_per_color: 24
+  research_centers: 6
+
+cities:
+  blue:
+    - Paris
+    - London
+    - Atlanta
+    - Milan
+    - Washington
+    - Madrid
+    - San Francisco
+    - St. Petersburg
+    - Chicago
+    - Montréal
+    - New York
+    - Essen
+  black:
+    - Karachi
+    - Cairo
+    - Riyadh
+    - Istanbul
+    - Kolkata
+    - Tehran
+    - Chennai
+    - Delhi
+    - Algiers
+    - Baghdad
+    - Mumbai
+    - Moscow
+  yellow:
+    - Khartoum
+    - São Paulo
+    - Mexico City
+    - Lima
+    - Miami
+    - Bogotá
+    - Lagos
+    - Johannesburg
+    - Buenos Aires
+    - Los Angeles
+    - Santiago
+    - Kinshasa
+  red:
+    - Beijing
+    - Jakarta
+    - Manila
+    - Seoul
+    - Hong Kong
+    - Osaka
+    - Ho Chi Minh City
+    - Shanghai
+    - Taipei
+    - Bangkok
+    - Tokyo
+    - Sydney
+
+edges:
+  - [San Francisco, Los Angeles]
+  - [San Francisco, Chicago]
+  - [San Francisco, Tokyo]
+  - [San Francisco, Manila]
+  - [Los Angeles, Sydney]
+  - [Los Angeles, Chicago]
+  - [Los Angeles, Mexico City]
+  - [Chicago, Mexico City]
+  - [Chicago, Atlanta]
+  - [Chicago, Montréal]
+  - [Atlanta, Washington]
+  - [Atlanta, Miami]
+  - [Montréal, Washington]
+  - [Montréal, New York]
+  - [Washington, Miami]
+  - [Washington, New York]
+  - [New York, London]
+  - [New York, Madrid]
+  - [Mexico City, Miami]
+  - [Mexico City, Bogotá]
+  - [Mexico City, Lima]
+  - [Miami, Bogotá]
+  - [Bogotá, Lima]
+  - [Bogotá, Buenos Aires]
+  - [Bogotá, São Paulo]
+  - [Lima, Santiago]
+  - [Buenos Aires, São Paulo]
+  - [São Paulo, Madrid]
+  - [São Paulo, Lagos]
+  - [Lagos, Kinshasa]
+  - [Lagos, Khartoum]
+  - [Kinshasa, Khartoum]
+  - [Kinshasa, Johannesburg]
+  - [Johannesburg, Khartoum]
+  - [Khartoum, Cairo]
+  - [London, Madrid]
+  - [London, Paris]
+  - [Madrid, Paris]
+  - [Madrid, Algiers]
+  - [Paris, Essen]
+  - [Paris, Algiers]
+  - [Paris, Milan]
+  - [Essen, Milan]
+  - [Essen, St. Petersburg]
+  - [Milan, Istanbul]
+  - [St. Petersburg, Istanbul]
+  - [St. Petersburg, Moscow]
+  - [Istanbul, Algiers]
+  - [Istanbul, Cairo]
+  - [Istanbul, Baghdad]
+  - [Istanbul, Moscow]
+  - [Algiers, Cairo]
+  - [Cairo, Baghdad]
+  - [Cairo, Riyadh]
+  - [Moscow, Tehran]
+  - [Baghdad, Riyadh]
+  - [Baghdad, Tehran]
+  - [Baghdad, Karachi]
+  - [Tehran, Delhi]
+  - [Tehran, Karachi]
+  - [Karachi, Delhi]
+  - [Karachi, Riyadh]
+  - [Delhi, Mumbai]
+  - [Delhi, Kolkata]
+  - [Delhi, Chennai]
+  - [Mumbai, Chennai]
+  - [Kolkata, Hong Kong]
+  - [Kolkata, Bangkok]
+  - [Chennai, Bangkok]
+  - [Chennai, Jakarta]
+  - [Bangkok, Hong Kong]
+  - [Bangkok, Jakarta]
+  - [Bangkok, Ho Chi Minh City]
+  - [Hong Kong, Shanghai]
+  - [Hong Kong, Taipei]
+  - [Hong Kong, Manila]
+  - [Hong Kong, Ho Chi Minh City]
+  - [Ho Chi Minh City, Jakarta]
+  - [Ho Chi Minh City, Manila]
+  - [Jakarta, Sydney]
+  - [Manila, Sydney]
+  - [Manila, Taipei]
+  - [Taipei, Shanghai]
+  - [Taipei, Osaka]
+  - [Shanghai, Beijing]
+  - [Shanghai, Seoul]
+  - [Shanghai, Tokyo]
+  - [Beijing, Seoul]
+  - [Seoul, Tokyo]
+  - [Osaka, Tokyo]
