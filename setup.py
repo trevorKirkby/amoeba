@@ -14,6 +14,9 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=["pyyaml"],
     include_package_data=True,
+    entry_points={
+        'console_scripts': ['amoeba=amoeba.main:main']
+    },
     classifiers=[
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
