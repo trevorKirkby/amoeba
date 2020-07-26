@@ -1,4 +1,4 @@
-from collections import deque
+from collections import deque, defaultdict
 from random import shuffle, choice
 
 class City:
@@ -8,7 +8,7 @@ class City:
         self.population = population
         self.neighbors = []
         self.research = False
-        self.infections = {}
+        self.infections = defaultdict(int)
         self.players = []
     def infect(self, disease, amount):
         self.infections[disease] += amount
@@ -24,13 +24,20 @@ class Disease:
         self.cubes_remaining = cubes_max
         self.cured = False
         self.eradicated = False
+    def take(self, n=1):
+        if self.cubes_remaining < n:
+            raise RuntimeError(f'GAME OVER: no more {self.color} disease cubes left.')
+        self.cubes_remaining -= n
+    def replace(self, n=1):
+        self.cubes_remaining += n
     def __hash__(self):
         return hash(self.color)
     def __eq__(self,other):
         return self.color == other.color
 
 class Player:
-    def __init__(self, location):
+    def __init__(self, name, location):
+        self.name = name
         self.city = location
         self.action_count = 0
         self.cards = deque()
@@ -52,7 +59,7 @@ class World:
         self.diseases = {}
         self.cities = {}
         for color in config["cities"]:
-            self.diseases[color] = Disease(color, config["constants"]["cubes_per_color"])
+            self.diseases[color] = Disease(color, config["cubes_per_color"])
             for name in config["cities"][color]:
                 self.cities[name] = City(name, 0, color)
         for name1, name2 in config["edges"]:
@@ -62,13 +69,43 @@ class World:
             city2.neighbors.append(city1)
         self.config = config
 
+    def start(self, num_players):
+        if num_players > len(self.config['initial_city_cards']) or self.config['initial_city_cards'][num_players - 1] < 0:
+            raise ValueError(f'Invalid number of players: {num_players}.')
+        # Place initial research centers.
+        self.research = []
+        for name in self.config['start_research']:
+            city = self.cities[name]
+            city.research = True
+            self.research.append(city)
+        # Initialize infections.
         self.infection_counter = 0
         self.outbreak_count = 0
-        self.infection_deck = deque()
+        self.infection_deck = deque(self.cities.keys())
+        shuffle(self.infection_deck)
         self.infection_discard = deque()
-        self.player_deck = deque()
+        for n in self.config['initial_infections']:
+            self.draw_infection_card(n)
+        # Initialize the player deck.
+        self.player_deck = deque(self.cities.keys())
+        shuffle(self.player_deck)
         self.player_discard = deque()
-        self.turn_rotation = deque()
+        # Initialize the players.
+        self.players = []
+        for i in range(num_players):
+            name = f'Player-{i+1}'
+            player = Player(name, self.cities[self.config['start_city']])
+            for j in range(self.config['initial_city_cards'][num_players]):
+                self.next_card(player)
+            self.players.append(player)
+
+    def next_card(self, player):
+        card = self.player_deck.pop()
+        if not card:
+            raise RuntimeError('GAME OVER: no more player cards.')
+        self.player_discard.append(card)
+        player.cards.append(card)
+        print(f'Player {player.name} draws {card}.')
 
     def epidemic(self):
         self.infection_counter += 1 #Increase
@@ -79,8 +116,24 @@ class World:
         self.infection_deck.extend(self.infection_discard)
         self.infection_discard.clear()
 
-    def infect(self):
-        for i in range(config['infection_cards_per_turn'][self.infection_counter]):
-            target_city = self.infection_deck.pop()
-            target_city.infect(target_city.endemic_disease, 1)
-            self.infection_discard.append(target_city)
+    def infect_city(self, city, color):
+        print(f'infecting {city.name}.')
+        if city.infections[color] < self.config['outbreak_threshold']:
+            self.diseases[color].take()
+            city.infections[color] += 1
+        else:
+            # Outbreak!
+            print(f'Outbreak in {city_name}.')
+            if self.outbreak_counter == self.config['max_outbreaks']:
+                raise RuntimeError('GAME OVER: reached max infections.')
+            for neighbor in city.neighbors:
+                self.infect_city(neighor, color)
+
+    def draw_infection_card(self, infections=1):
+        target_city = self.infection_deck.pop()
+        if target_city is None:
+            raise RuntimeError('GAME OVER: no more infection cards.')
+        self.infection_discard.append(target_city)
+        target_city = self.cities[target_city]
+        for i in range(infections):
+            self.infect_city(target_city, target_city.endemic_disease)

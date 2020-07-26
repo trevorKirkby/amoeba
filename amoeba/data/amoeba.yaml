@@ -1,14 +1,19 @@
-min_players: 2
-max_players: 4
-
+# The city where all players start.
 start_city: Atlanta
+# Initial locations of research centers.
 start_research: [Atlanta]
-
+# Initial number of city cards indexed by the number of players.
+# -1 means this number of players is not allowed.
+initial_city_cards: [-1, 4, 3, 2]
+# Number of initial infections to place.
+initial_infections: [3, 3, 3, 2, 2, 2, 1, 1, 1]
 # Number of city cards to draw after each player's turn.
 city_cards_per_turn: 2
 # Indexed by the current infection counter.
 infection_cards_per_turn: [2, 2, 2, 3, 3, 4, 4]
-# Maximum allowed outbreaks
+# Max allowed infections of one color before an outbreak.
+outbreak_threshold: 3
+# Maximum allowed outbreaks before losing the game.
 max_outbreaks: 7
 # Total number of cubes available per color.
 cubes_per_color: 24

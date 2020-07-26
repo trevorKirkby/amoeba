@@ -31,12 +31,11 @@ def main():
         print(f'Unable to locate the specified config file: {args.config}.')
         sys.exit(-1)
 
-    # Check args.
-    if args.num_players < config['min_players'] or args.num_players > config['max_players']:
-        print(f'The number of players must be between {config["min_players"]} and {config["max_players"]}.')
-
     # Initialize the world.
-    world = World(config, args.num_players)
+    world = World(config)
+
+    # Start the game.
+    world.start(args.num_players)
 
 if __name__ == "__main__":
     main()
