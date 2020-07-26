@@ -60,10 +60,15 @@ class World:
         self.player_deck = deque()
         self.player_discard = deque()
         self.turn_rotation = deque()
-        self.cities = []
+        self.diseases = {}
+        self.cities = {}
+    def add_disease(self, disease):
+        self.diseases[disease.color] = disease
     def add_city(self, city):
-        self.cities.append(city)
+        self.cities[city.name] = city
     def add_edge(self, city1, city2):
+        city1 = self.cities[city1]
+        city2 = self.cities[city2]
         city1.neighbors.append(city2)
         city2.neighbors.append(city1)
     def epidemic(self):
