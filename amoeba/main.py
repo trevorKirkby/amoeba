@@ -8,7 +8,7 @@ def main():
     config = yaml.safe_load(stream)
 
     diseases = {}
-    world = World(0, 0)
+    world = World([2,2,2,3,3,4,4], 2, 8, 6)
     for color in config["cities"]:
         world.add_disease(Disease(color, config["constants"]["cubes_per_color"]))
         for name in config["cities"][color]:
