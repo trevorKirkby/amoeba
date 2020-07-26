@@ -1,6 +1,19 @@
-constants:
-  cubes_per_color: 24
-  research_centers: 6
+min_players: 2
+max_players: 4
+
+start_city: Atlanta
+start_research: [Atlanta]
+
+# Number of city cards to draw after each player's turn.
+city_cards_per_turn: 2
+# Indexed by the current infection counter.
+infection_cards_per_turn: [2, 2, 2, 3, 3, 4, 4]
+# Maximum allowed outbreaks
+max_outbreaks: 7
+# Total number of cubes available per color.
+cubes_per_color: 24
+# Total number of research centers available.
+research_centers: 6
 
 cities:
   blue:

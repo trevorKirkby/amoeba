@@ -2,11 +2,10 @@ from collections import deque
 from random import shuffle, choice
 
 class City:
-    def __init__(self, name, population, endemic_disease, world):
+    def __init__(self, name, population, endemic_disease):
         self.name = name
         self.endemic_disease = endemic_disease
         self.population = population
-        self.world = world
         self.neighbors = []
         self.research = False
         self.infections = {}
@@ -17,7 +16,6 @@ class City:
             self.infections[disease] = 3
             self.outbreak(disease)
     def outbreak(self, disease):
-        world.outbreak_count += 1
         for city in self.neighbors: city.infect(disease, 1)
 
 class Disease:
@@ -50,9 +48,20 @@ class Player:
         return True
 
 class World:
-    def __init__(self, infection_rates, player_draw_rate):
-        self.infection_rates = infection_rates
-        self.player_draw_rate = player_draw_rate
+    def __init__(self, config):
+        self.diseases = {}
+        self.cities = {}
+        for color in config["cities"]:
+            self.diseases[color] = Disease(color, config["constants"]["cubes_per_color"])
+            for name in config["cities"][color]:
+                self.cities[name] = City(name, 0, color)
+        for name1, name2 in config["edges"]:
+            city1 = self.cities[name1]
+            city2 = self.cities[name2]
+            city1.neighbors.append(city2)
+            city2.neighbors.append(city1)
+        self.config = config
+
         self.infection_counter = 0
         self.outbreak_count = 0
         self.infection_deck = deque()
@@ -60,17 +69,7 @@ class World:
         self.player_deck = deque()
         self.player_discard = deque()
         self.turn_rotation = deque()
-        self.diseases = {}
-        self.cities = {}
-    def add_disease(self, disease):
-        self.diseases[disease.color] = disease
-    def add_city(self, city):
-        self.cities[city.name] = city
-    def add_edge(self, city1, city2):
-        city1 = self.cities[city1]
-        city2 = self.cities[city2]
-        city1.neighbors.append(city2)
-        city2.neighbors.append(city1)
+
     def epidemic(self):
         self.infection_counter += 1 #Increase
         target_city = self.infection_deck.popleft() #Infect
@@ -79,8 +78,9 @@ class World:
         random.shuffle(self.infection_discard) #Intensify
         self.infection_deck.extend(self.infection_discard)
         self.infection_discard.clear()
+
     def infect(self):
-        for i in range(infection_rates[infection_counter]):
+        for i in range(config['infection_cards_per_turn'][self.infection_counter]):
             target_city = self.infection_deck.pop()
             target_city.infect(target_city.endemic_disease, 1)
             self.infection_discard.append(target_city)
