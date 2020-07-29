@@ -10,7 +10,7 @@ class CityCard(PlayerCard):
         super().__init__('city', city.name)
         self.city = city
     def __eq__(self, other):
-        return (self.city == other.city or self.city == other)
+        return (self.city == other)
 
 class EpidemicCard(PlayerCard):
     def __init__(self):

@@ -12,6 +12,7 @@ class City:
         self.neighbors = []
         self.players = []
         self.research = False
+        self.outbreaking = False
         self.infections = Counter()
 
 class Player:
@@ -20,13 +21,14 @@ class Player:
         self.city = location
         self.action_count = 0
         self.cards = deque()
-        self.actions = [Drive, ShuttleFlight, DirectFlight, CharterFlight, TreatDisease, BuildResearch, ShareKnowledge, DiscoverCure]
+        self.actions = [Drive, ShuttleFlight, DirectFlight, CharterFlight, TreatDisease, BuildResearch, ShareKnowledge, DiscoverCure, Ability]
 
     def move(self, destination):
         self.city = destination
 
 class Disease:
     def __init__(self, color, cubes_max, outbreak_threshold):
+        self.name = color
         self.color = color
         self.cubes_remaining = cubes_max
         self.outbreak_threshold = outbreak_threshold
@@ -39,27 +41,30 @@ class Disease:
 
     def infect(self, city, amount=1):
         for i in range(amount):
-            print(f'infecting {city.name}.')
+            print(f'Infecting {city.name}.')
             if city.infections[self] == self.outbreak_threshold:
                 self.outbreak(city)
                 break
             if self.cubes_remaining == 0:
-                raise RuntimeError(f'GAME OVER: no more {self.color} disease cubes left.')
+                raise RuntimeError(f'GAME OVER: no more {self.name} disease cubes left.')
             self.cubes_remaining -= 1
             city.infections[self] += 1
 
     def remove(self, city, amount=1):
         for i in range(amount):
             if city.infections[self] == 0: break
-            print(f'treating {city.name}.')
+            print(f'Treating {city.name}.')
             self.cubes_remaining += 1
             city.infections[self] -= 1
 
     def outbreak(self, city):
-        print(f'Outbreak in {city_name}.')
+        print(f'Outbreak in {city.name}.')
         self.outbreak_count += 1
+        city.outbreaking = True
         for neighbor in city.neighbors:
-            self.infect(neighbor, 1)
+            if not neighbor.outbreaking:
+                self.infect(neighbor, 1)
+        city.outbreaking = False
 
 class World:
     def __init__(self, config):
@@ -95,7 +100,7 @@ class World:
         shuffle(self.player_deck)
         self.player_discard = deque()
         # Initialize the players.
-        self.players = []
+        self.players = deque()
         for i in range(num_players):
             name = f'Player-{i+1}'
             player = Player(name, self.cities[self.config['start_city']])
@@ -109,6 +114,8 @@ class World:
         buckets = [bucket+[EpidemicCard()] for bucket in buckets]
         for bucket in buckets: shuffle(bucket)
         self.player_deck = deque([card for bucket in buckets for card in bucket])
+        # Start the game.
+        self.main_loop()
 
     def draw_infection_card(self, infections=1):
         target_city = self.infection_deck.pop()
@@ -137,19 +144,69 @@ class World:
         self.infection_deck.extend(self.infection_discard)
         self.infection_discard.clear()
 
-    def player_turn(self, player):
-        return
+    def pick(self, choice_description, pick_from, cancel=False): #Helper method for getting text input.
+        picked = None
+        while not picked:
+            print(f'Choose {choice_description}:')
+            for i in range(len(pick_from)):
+                print(f'\t ({i}) {pick_from[i].name}')
+            if cancel: print(f'\t ({len(pick_from)}) Cancel')
+            user_pick = input('Pick one: ')
+            try:
+                user_pick = int(user_pick)
+                if cancel and user_pick == len(pick_from): return 'Cancel'
+                picked = pick_from[user_pick]
+            except (ValueError, KeyError) as e:
+                print('Must be specified as one of the listed numbers.')
+        return picked
 
-    def player_discard(self, player):
-        return
+    def player_turn(self, player): #Quick text-based interface for player turns.
+        print(f'\n{player.name}\'s turn.')
+        player.action_count = self.config['actions_per_turn']
+        while player.action_count:
+            action = self.pick('an action', player.actions)
+            choices = action.choices(player, **self.__dict__) #Actions pretty much happen on a world-level and can view the full world state in order to decide what actions are legal and what isn't.
+            viable = True
+            canceled = False
+            chosen = {}
+            choice = next(choices)
+            while choice:
+                if not choice[1]:
+                    viable = False
+                    break
+                latest_chosen = self.pick(choice[0],choice[1],cancel=True)
+                if latest_chosen == 'Cancel':
+                    canceled = True
+                    break
+                chosen.update({choice[0]:latest_chosen})
+                try: choice = choices.send(chosen)
+                except StopIteration: break
+            if canceled:
+                continue
+            if not viable:
+                print('That action can\'t be taken right now.')
+                continue
+            action.execute(player, **chosen)
+            player.action_count -= 1
+            self.check_win()
+        print(f'{player.name} has used all their actions.')
+
+    def check_discard(self, player):
+        while len(player.cards) > self.config['max_cards_per_player']:
+            print(f'{player.name} has too many cards.')
+            player.cards.remove(self.pick('a card to discard', player.cards))
+
+    def check_win(self):
+        if all([disease.cured for disease in self.diseases.values()]):
+            raise RuntimeError('You won!!!')
 
     def main_loop(self):
-        while not self.game_over:
+        while True:
             active_player = self.players.pop()
-            player_turn(active_player)
+            self.player_turn(active_player)
             for i in range(self.config['city_cards_per_turn']):
-                self.draw_player_cards(active_player)
-            player_discard(active_player)
-            for i in range(config['infection_cards_per_turn'][self.infection_counter]):
+                self.draw_player_card(active_player)
+            self.check_discard(active_player)
+            for i in range(self.config['infection_cards_per_turn'][self.infection_counter]):
                 self.draw_infection_card()
             self.players.appendleft(active_player)

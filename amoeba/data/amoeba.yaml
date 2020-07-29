@@ -7,8 +7,12 @@ start_research: [Atlanta]
 initial_city_cards: [-1, 4, 3, 2]
 # Number of initial infections to place.
 initial_infections: [3, 3, 3, 2, 2, 2, 1, 1, 1]
+# Maximum number of cards a player can hold before they have to discard some.
+max_cards_per_player: 7
 # Number of city cards to draw after each player's turn.
 city_cards_per_turn: 2
+# Number of actions a player gets on each turn.
+actions_per_turn: 4
 # Indexed by the current infection counter.
 infection_cards_per_turn: [2, 2, 2, 3, 3, 4, 4]
 # Max allowed infections of one color before an outbreak.
