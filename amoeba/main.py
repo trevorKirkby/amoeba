@@ -16,6 +16,7 @@ def main():
     parser.add_argument('-v', '--verbose', action='store_true', help='be verbose')
     parser.add_argument('-c', '--config', type=str, default='amoeba.yaml', metavar='YAML', help='config file to use')
     parser.add_argument('-n', '--num-players', type=int, metavar='N', help='number of players')
+    parser.add_argument('-e', '--num-epidemics', type=int, metavar='N', help='number of epidemic cards')
     args = parser.parse_args()
 
     # Load our YAML configuration file.
@@ -31,12 +32,11 @@ def main():
         print(f'Unable to locate the specified config file: {args.config}.')
         sys.exit(-1)
 
-    # Check args.
-    if args.num_players < config['min_players'] or args.num_players > config['max_players']:
-        print(f'The number of players must be between {config["min_players"]} and {config["max_players"]}.')
-
     # Initialize the world.
-    world = World(config, args.num_players)
+    world = World(config)
+
+    # Start the game.
+    world.start(args.num_players, args.num_epidemics)
 
 if __name__ == "__main__":
     main()
