@@ -26,6 +26,13 @@ class Player:
     def move(self, destination):
         self.city = destination
 
+    def describe(self):
+        city_status = [f'{n} {color}' for n, color in self.city.infections.items()] or ['no disease']
+        if self.city.research:
+            city_status.append('research center')
+        my_cards = ', '.join([C.name for C in self.cards])
+        return f'in {self.city.name} ({", ".join(city_status)}) with cards: {my_cards}.'
+
 class Disease:
     def __init__(self, color, cubes_max, outbreak_threshold):
         self.name = color
@@ -164,6 +171,7 @@ class World:
         print(f'\n{player.name}\'s turn.')
         player.action_count = self.config['actions_per_turn']
         while player.action_count:
+            print('You are', player.describe())
             action = self.pick('an action', player.actions)
             choices = action.choices(player, **self.__dict__) #Actions pretty much happen on a world-level and can view the full world state in order to decide what actions are legal and what isn't.
             viable = True
