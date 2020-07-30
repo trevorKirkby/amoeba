@@ -70,8 +70,8 @@ class ShareKnowledge(Ability):
 class DiscoverCure(Ability):
     name = 'Discover Cure'
     def choices(player, diseases, **kwargs):
-        chosen = yield 'disease', [disease for disease in diseases.values() if (not disease.cured and len([card for card in self.cards if card.city.endemic_disease == disease])>=5)]
-        for i in range(1,6): chosen = yield f'card {i}', [card for card in self.cards if (card.city.endemic_disease == disease and card not in chosen.values())]
+        chosen = yield 'disease', [disease for disease in diseases.values() if (not disease.cured and len([card for card in player.cards if card.city.endemic_disease == disease])>=5)]
+        for i in range(1,6): chosen = yield f'card {i}', [card for card in player.cards if (card.city.endemic_disease == disease and card not in chosen.values())]
     def execute(player, **kwargs):
         for i in range(1,6): player.cards.remove(kwargs[f'card {i}'])
         kwargs['disease'].cured = True
