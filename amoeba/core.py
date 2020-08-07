@@ -3,6 +3,7 @@ from random import shuffle, choice
 
 from amoeba.abilities import *
 from amoeba.cards import *
+import amoeba.robo as robo
 
 class City:
     def __init__(self, name, population, endemic_disease):
@@ -79,8 +80,12 @@ class World:
         self.cities = {}
         for color in config["cities"]:
             self.diseases[color] = Disease(color, config['cubes_per_color'], config['outbreak_threshold'])
+            robo.enable(color + " cube", "bin")
             for name in config["cities"][color]:
                 self.cities[name] = City(name, 0, self.diseases[color])
+        for city in self.cities:
+            for color in config["cities"]:
+                robo.enable(color + " cube", city)
         for name1, name2 in config["edges"]:
             city1 = self.cities[name1]
             city2 = self.cities[name2]
@@ -95,6 +100,9 @@ class World:
         for name in self.config['start_research']:
             city = self.cities[name]
             city.research = True
+
+        print(robo._objects)
+
         # Initialize infections.
         self.infection_counter = 0
         self.infection_deck = deque(self.cities.values())
