@@ -6,6 +6,9 @@ from amoeba.cards import *
 import amoeba.robo as robo
 
 class City:
+    """A City object records the cubes, players and research centers at its location,
+    and knows what other cities it is connected to.
+    """
     def __init__(self, name, population, endemic_disease):
         self.name = name
         self.endemic_disease = endemic_disease
@@ -17,6 +20,8 @@ class City:
         self.infections = Counter()
 
 class Player:
+    """A Player object records its current location, player cards and turn progress.
+    """
     def __init__(self, name, location):
         self.name = name
         self.city = location
@@ -35,6 +40,10 @@ class Player:
         return f'in {self.city.name} ({", ".join(city_status)}) with cards: {my_cards}.'
 
 class Disease:
+    """A Disease object manages the cubes of a single color and is responsible for
+    infections, outbreaks, and detecting if the game ends because all cubes are
+    already on the board.
+    """
     def __init__(self, color, cubes_max, outbreak_threshold):
         self.name = color
         self.color = color
@@ -75,6 +84,9 @@ class Disease:
         city.outbreaking = False
 
 class World:
+    """The World object manages the City, Player and Disease objects in a game, and
+    implements the game turn mechanics.
+    """
     def __init__(self, config):
         self.diseases = {}
         self.cities = {}
