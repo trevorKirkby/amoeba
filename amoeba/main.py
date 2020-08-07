@@ -15,8 +15,8 @@ def main():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-v', '--verbose', action='store_true', help='be verbose')
     parser.add_argument('-c', '--config', type=str, default='amoeba.yaml', metavar='YAML', help='config file to use')
-    parser.add_argument('-n', '--num-players', type=int, metavar='N', help='number of players')
-    parser.add_argument('-e', '--num-epidemics', type=int, metavar='N', help='number of epidemic cards')
+    parser.add_argument('-n', '--num-players', type=int, default=2, metavar='N', help='number of players')
+    parser.add_argument('-e', '--num-epidemics', type=int, default=3, metavar='N', help='number of epidemic cards')
     args = parser.parse_args()
 
     # Load our YAML configuration file.
