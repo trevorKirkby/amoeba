@@ -36,7 +36,7 @@ def main():
     # Initialize the world.
     world = World(config)
 
-    robo.add_listener(robo.Logger(prefix=">> "))
+    robo.listen(robo.Logger(prefix=">> "))
 
     # Start the game.
     world.start(args.num_players, args.num_epidemics)

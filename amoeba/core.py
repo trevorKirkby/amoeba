@@ -52,6 +52,9 @@ class Disease:
         self.cured = False
         self.eradicated = False
         self.outbreak_count = 0
+        robo.listen(
+            lambda what, src, dst: print(f"{self.color} got ({what},{src},{dst})"),
+            what=f"{self.color} cube")
 
     def __hash__(self):
         return hash(self.color)

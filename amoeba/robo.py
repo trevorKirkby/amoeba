@@ -30,14 +30,21 @@ def parse(task):
     return what, src, dst
 
 
-def add_listener(callback, filter=None):
+def listen(callback, what=None):
+    if isinstance(what, str):
+        filter = lambda w,s,d: w == what
+    elif isinstance(what, (tuple, list)):
+        what = tuple(what)
+        filter = lambda w,s,d: w in what
+    else:
+        filter = lambda w,s,d: True
     _listeners.append((callback, filter))
 
 
 def do(task):
     what, src, dst = parse(task)
     for listener, filter in _listeners:
-        if filter is None or filter(what):
+        if filter(what, src, dst):
             listener(what, src, dst)
 
 
