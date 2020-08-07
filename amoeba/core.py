@@ -28,7 +28,7 @@ class Player:
         self.city = destination
 
     def describe(self):
-        city_status = [f'{n} {color}' for n, color in self.city.infections.items()] or ['no disease']
+        city_status = [f'{d.color} {n}' for d, n in self.city.infections.items()] or ['no disease']
         if self.city.research:
             city_status.append('research center')
         my_cards = ', '.join([C.name for C in self.cards])
@@ -49,13 +49,13 @@ class Disease:
 
     def infect(self, city, amount=1):
         for i in range(amount):
-            print(f'Infecting {city.name}.')
             if city.infections[self] == self.outbreak_threshold:
                 self.outbreak(city)
                 break
             if self.cubes_remaining == 0:
                 raise RuntimeError(f'GAME OVER: no more {self.name} disease cubes left.')
             self.cubes_remaining -= 1
+            robo.do(f"{self.color} cube from bin to {city.name}")
             city.infections[self] += 1
 
     def remove(self, city, amount=1):
@@ -83,7 +83,13 @@ class World:
             robo.enable(color + " cube", "bin")
             for name in config["cities"][color]:
                 self.cities[name] = City(name, 0, self.diseases[color])
+        robo.enable("research center", "bin")
         for city in self.cities:
+            robo.enable("research center", city)
+            robo.enable(city, "infection deck")
+            robo.enable(city, "infection discard")
+            robo.enable(city, "player deck")
+            robo.enable(city, "player discard")
             for color in config["cities"]:
                 robo.enable(color + " cube", city)
         for name1, name2 in config["edges"]:
@@ -96,13 +102,17 @@ class World:
     def start(self, num_players, num_epidemics):
         if num_players > len(self.config['initial_city_cards']) or self.config['initial_city_cards'][num_players - 1] < 0:
             raise ValueError(f'Invalid number of players: {num_players}.')
+        # Define tasks associated with players.
+        for i in range(num_players):
+            robo.enable(f"player {i+1}", "bin")
+            for city in self.cities:
+                robo.enable(f"player {i+1}", city)
+                robo.enable(city, f"player {i+1}")
         # Place initial research centers.
         for name in self.config['start_research']:
             city = self.cities[name]
+            robo.do(f"research center from bin to {city.name}")
             city.research = True
-
-        print(robo._objects)
-
         # Initialize infections.
         self.infection_counter = 0
         self.infection_deck = deque(self.cities.values())
@@ -117,8 +127,9 @@ class World:
         # Initialize the players.
         self.players = deque()
         for i in range(num_players):
-            name = f'Player-{i+1}'
+            name = f'player {i+1}'
             player = Player(name, self.cities[self.config['start_city']])
+            robo.do(f"player {i+1} from bin to {player.city.name}")
             for j in range(self.config['initial_city_cards'][num_players]):
                 self.draw_player_card(player)
             self.players.append(player)
@@ -143,11 +154,10 @@ class World:
         card = self.player_deck.pop()
         if not card:
             raise RuntimeError('GAME OVER: no more player cards.')
-        print(f'Player {player.name} draws {card.name}.')
         if card.type == 'epidemic':
             self.epidemic()
             return
-        self.player_discard.append(card)
+        robo.do(f"{card.name} from player deck to {player.name}")
         player.cards.append(card)
 
     def epidemic(self):

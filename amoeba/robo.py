@@ -2,10 +2,15 @@
 """
 import re
 import collections
+import sys
 
-_parser = re.compile("^([\w\s]+) from ([\w\s]+) to ([\w\s]+)$")
+
+_parser = re.compile("^([\w \.]+) from ([\w \.]+) to ([\w \.]+)$")
 
 _objects = collections.defaultdict(set)
+
+_listeners = []
+
 
 def enable(what, where):
     _objects[what].add(where)
@@ -23,3 +28,22 @@ def parse(task):
     if dst not in _objects[what]:
         raise ValueError(f"Invalid '{what}' destination: '{dst}'.")
     return what, src, dst
+
+
+def add_listener(callback, filter=None):
+    _listeners.append((callback, filter))
+
+
+def do(task):
+    what, src, dst = parse(task)
+    for listener, filter in _listeners:
+        if filter is None or filter(what):
+            listener(what, src, dst)
+
+
+class Logger:
+    def __init__(self, prefix='', name=None):
+        self.prefix = prefix
+        self.out = open(name, "w") if name else sys.stdout
+    def __call__(self, what, src, dst):
+        print(f"{self.prefix}{what} from {src} to {dst}", file=self.out)

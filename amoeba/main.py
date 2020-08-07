@@ -6,6 +6,7 @@ import sys
 import yaml
 
 from amoeba.core import *
+from amoeba.robo import *
 
 
 def main():
@@ -34,6 +35,8 @@ def main():
 
     # Initialize the world.
     world = World(config)
+
+    robo.add_listener(robo.Logger(prefix=">> "))
 
     # Start the game.
     world.start(args.num_players, args.num_epidemics)
