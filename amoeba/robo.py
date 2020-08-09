@@ -16,11 +16,7 @@ def enable(what, where):
     _objects[what].add(where)
 
 
-def parse(task):
-    parsed = _parser.match(task)
-    if not parsed or len(parsed.groups()) != 3:
-        raise ValueError(f"Invalid task: '{task}'.")
-    what, src, dst = parsed.groups()
+def validate(what, src, dst):
     if what not in _objects:
         raise ValueError(f"Invalid task object: '{what}'.")
     if src not in _objects[what]:
@@ -28,6 +24,13 @@ def parse(task):
     if dst not in _objects[what]:
         raise ValueError(f"Invalid '{what}' destination: '{dst}'.")
     return what, src, dst
+
+
+def parse(task):
+    parsed = _parser.match(task)
+    if not parsed or len(parsed.groups()) != 3:
+        raise ValueError(f"Invalid task: '{task}'.")
+    return validate(parsed.groups())
 
 
 def listen(callback, what=None):
@@ -41,8 +44,8 @@ def listen(callback, what=None):
     _listeners.append((callback, filter))
 
 
-def do(task):
-    what, src, dst = parse(task)
+def do(what, src, dst):
+    what, src, dst = validate(what, src, dst)
     for listener, filter in _listeners:
         if filter(what, src, dst):
             listener(what, src, dst)

@@ -67,7 +67,7 @@ class Disease:
             if self.cubes_remaining == 0:
                 raise RuntimeError(f'GAME OVER: no more {self.name} disease cubes left.')
             self.cubes_remaining -= 1
-            robo.do(f"{self.color} cube from bin to {city.name}")
+            robo.do(f"{self.color} cube", "bin", city.name)
             city.infections[self] += 1
 
     def remove(self, city, amount=1):
@@ -126,7 +126,7 @@ class World:
         # Place initial research centers.
         for name in self.config['start_research']:
             city = self.cities[name]
-            robo.do(f"research center from bin to {city.name}")
+            robo.do("research center", "bin", city.name)
             city.research = True
         # Initialize infections.
         self.infection_counter = 0
@@ -144,7 +144,7 @@ class World:
         for i in range(num_players):
             name = f'player {i+1}'
             player = Player(name, self.cities[self.config['start_city']])
-            robo.do(f"player {i+1} from bin to {player.city.name}")
+            robo.do(f"player {i+1}", "bin", player.city.name)
             for j in range(self.config['initial_city_cards'][num_players]):
                 self.draw_player_card(player)
             self.players.append(player)
@@ -172,7 +172,7 @@ class World:
         if card.type == 'epidemic':
             self.epidemic()
             return
-        robo.do(f"{card.name} from player deck to {player.name}")
+        robo.do(card.name, "player deck", player.name)
         player.cards.append(card)
 
     def epidemic(self):
