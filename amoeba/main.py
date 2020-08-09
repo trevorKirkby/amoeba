@@ -18,6 +18,7 @@ def main():
     parser.add_argument('-c', '--config', type=str, default='amoeba.yaml', metavar='YAML', help='config file to use')
     parser.add_argument('-n', '--num-players', type=int, default=2, metavar='N', help='number of players')
     parser.add_argument('-e', '--num-epidemics', type=int, default=3, metavar='N', help='number of epidemic cards')
+    parser.add_argument('--seed', type=int, default=None, help='random seed to use')
     args = parser.parse_args()
 
     # Load our YAML configuration file.
@@ -39,7 +40,8 @@ def main():
     robo.listen(robo.Logger(prefix=">> "))
 
     # Start the game.
-    world.start(args.num_players, args.num_epidemics)
+    world.start(args.num_players, args.num_epidemics, args.seed)
+
 
 if __name__ == "__main__":
     main()

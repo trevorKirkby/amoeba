@@ -1,5 +1,5 @@
 from collections import deque, Counter
-from random import shuffle, choice
+import random
 
 from amoeba.abilities import *
 from amoeba.cards import *
@@ -130,7 +130,8 @@ class World:
             city2.neighbors.append(city1)
         self.config = config
 
-    def start(self, num_players, num_epidemics):
+    def start(self, num_players, num_epidemics, seed):
+        gen = random.Random(seed)
         if num_players > len(self.config['initial_city_cards']) or self.config['initial_city_cards'][num_players - 1] < 0:
             raise ValueError(f'Invalid number of players: {num_players}.')
         # Define tasks associated with players.
@@ -147,13 +148,13 @@ class World:
         # Initialize infections.
         self.infection_counter = 0
         self.infection_deck = deque(self.cities.values())
-        shuffle(self.infection_deck)
+        gen.shuffle(self.infection_deck)
         self.infection_discard = deque()
         for n in self.config['initial_infections']:
             self.draw_infection_card(n)
         # Initialize the player deck.
         self.player_deck = deque([CityCard(city) for city in self.cities.values()])
-        shuffle(self.player_deck)
+        gen.shuffle(self.player_deck)
         self.player_discard = deque()
         # Initialize the players.
         self.players = deque()
@@ -162,14 +163,14 @@ class World:
             player = Player(name, self.cities[self.config['start_city']])
             robo.do(f"player {i+1}", "bin", player.city.name)
             for j in range(self.config['initial_city_cards'][num_players]):
-                self.draw_player_card(player)
+                self.draw_player_card(player, gen)
             self.players.append(player)
         # Initialize epidemics.
         cards_list = list(self.player_deck)
         bucket_size = round(len(cards_list) / num_epidemics)
         buckets = [cards_list[i:i+bucket_size] for i in range(0, len(cards_list), bucket_size)]
         buckets = [bucket+[EpidemicCard()] for bucket in buckets]
-        for bucket in buckets: shuffle(bucket)
+        for bucket in buckets: gen.shuffle(bucket)
         self.player_deck = deque([card for bucket in buckets for card in bucket])
         # Start the game.
         self.main_loop()
@@ -181,22 +182,22 @@ class World:
         if sum([disease.outbreak_count for disease in self.diseases.values()]) > self.config['max_outbreaks']:
             raise RuntimeError('GAME OVER: reached max outbreaks.')
 
-    def draw_player_card(self, player):
+    def draw_player_card(self, player, gen):
         card = self.player_deck.pop()
         if not card:
             raise RuntimeError('GAME OVER: no more player cards.')
         if card.type == 'epidemic':
-            self.epidemic()
+            self.epidemic(gen)
             return
         robo.do(card.name, "player deck", player.name)
         player.cards.append(card)
 
-    def epidemic(self):
+    def epidemic(self, gen):
         self.infection_counter += 1 #Increase
         target_city = self.infection_deck.popleft() #Infect
         target_city.endemic_disease.infect(target_city, 3)
         self.infection_discard.append(target_city)
-        shuffle(self.infection_discard) #Intensify
+        gen.shuffle(self.infection_discard) #Intensify
         self.infection_deck.extend(self.infection_discard)
         self.infection_discard.clear()
 
