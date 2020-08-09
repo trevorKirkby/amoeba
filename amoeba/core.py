@@ -119,10 +119,10 @@ class World:
         robo.enable("research center", "bin")
         for city in self.cities:
             robo.enable("research center", city)
-            robo.enable(city, "infection deck")
-            robo.enable(city, "infection discard")
-            robo.enable(city, "player deck")
-            robo.enable(city, "player discard")
+            robo.enable(city + " infection card", "infection deck")
+            robo.enable(city + " infection card", "infection discard")
+            robo.enable(city + " player card", "player deck")
+            robo.enable(city + " player card", "player discard")
             for color in config["cities"]:
                 robo.enable(color + " cube", city)
         for name1, name2 in config["edges"]:
@@ -149,7 +149,7 @@ class World:
             robo.enable(f"player {i+1}", "bin")
             for city in self.cities:
                 robo.enable(f"player {i+1}", city)
-                robo.enable(city, f"player {i+1}")
+                robo.enable(city + " player card", f"player {i+1} hand")
         # Place initial research centers.
         for name in self.config['start_research']:
             if self.research_centers_in_bin == 0:
@@ -187,6 +187,7 @@ class World:
 
     def draw_infection_card(self, infections=1):
         target_city = self.infection_deck.pop()
+        robo.do(target_city.name + " infection card", "infection deck", "infection discard")
         target_city.endemic_disease.infect(target_city, infections)
         self.infection_discard.append(target_city)
         if sum([disease.outbreak_count for disease in self.diseases.values()]) > self.config['max_outbreaks']:
@@ -199,7 +200,7 @@ class World:
         if card.type == 'epidemic':
             self.epidemic(gen)
             return
-        robo.do(card.name, "player deck", player.name)
+        robo.do(card.name + " player card", "player deck", player.name + " hand")
         player.cards.append(card)
 
     def epidemic(self, gen):
