@@ -1,3 +1,5 @@
+import amoeba.robo as robo
+
 class Ability:
     name = 'Pass'
     def choices(player, **kwargs):
@@ -10,7 +12,7 @@ class Drive(Ability):
     def choices(player, **kwargs):
         yield 'destination', player.city.neighbors
     def execute(player, destination):
-        player.move(destination)
+        robo.do(player.name, player.city.name, destination.name)
 
 class ShuttleFlight(Ability):
     name = 'Shuttle Flight'
@@ -18,7 +20,7 @@ class ShuttleFlight(Ability):
         if not player.city.research: yield 'destination', []
         yield 'destination', [city for city in cities.values() if (city.research and city != player.city)]
     def execute(player, destination):
-        player.move(destination)
+        robo.do(player.name, player.city.name, destination.name)
 
 class DirectFlight(Ability):
     name = 'Direct Flight'
@@ -26,7 +28,7 @@ class DirectFlight(Ability):
         yield 'destination', [card.city for card in player.cards if (card.type == 'city' and card.city != player.city)]
     def execute(player, destination):
         player.cards.remove(destination)
-        player.move(destination)
+        robo.do(player.name, player.city.name, destination.name)
 
 class CharterFlight(Ability):
     name = 'Charter Flight'
@@ -35,7 +37,7 @@ class CharterFlight(Ability):
         yield 'destination', [city for city in cities.values() if city != player.city]
     def execute(player, destination):
         player.cards.remove(player.city)
-        player.move(destination)
+        robo.do(player.name, player.city.name, destination.name)
 
 class TreatDisease(Ability):
     name = 'Treat Disease'
