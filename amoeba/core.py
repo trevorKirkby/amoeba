@@ -14,7 +14,6 @@ class City:
         self.endemic_disease = endemic_disease
         self.population = population
         self.neighbors = []
-        self.players = []
         self.research = False
         self.outbreaking = False
         self.infections = Counter()
@@ -31,15 +30,17 @@ class City:
 class Player:
     """A Player object records its current location, player cards and turn progress.
     """
-    def __init__(self, name, location):
+    def __init__(self, name):
         self.name = name
-        self.city = location
+        self.city = None
         self.action_count = 0
         self.cards = deque()
         self.actions = [Drive, ShuttleFlight, DirectFlight, CharterFlight, TreatDisease, BuildResearch, ShareKnowledge, DiscoverCure, Ability]
+        robo.listen(self.move, self.name)
 
-    def move(self, destination):
-        self.city = destination
+    def move(self, what, src, dst):
+        assert what == self.name
+        self.city = City.find(dst)
 
     def describe(self):
         city_status = [f'{d.color} {n}' for d, n in self.city.infections.items()] or ['no disease']
@@ -114,6 +115,7 @@ class World:
             robo.enable(color + " cube", "bin")
             for name in config["cities"][color]:
                 self.cities[name] = City(name, 0, self.diseases[color])
+        self.research_centers_in_bin = config["research_centers"]
         robo.enable("research center", "bin")
         for city in self.cities:
             robo.enable("research center", city)
@@ -129,6 +131,14 @@ class World:
             city1.neighbors.append(city2)
             city2.neighbors.append(city1)
         self.config = config
+        # Dispatch research center tasks.
+        robo.listen(self.move_research, "research center")
+
+    def move_research(self, what, src, dst):
+        assert what == 'research center' and dst != 'bin'
+        City.find(dst).research = True
+        if src != 'bin':
+            City.find(src).research = False
 
     def start(self, num_players, num_epidemics, seed):
         gen = random.Random(seed)
@@ -142,9 +152,9 @@ class World:
                 robo.enable(city, f"player {i+1}")
         # Place initial research centers.
         for name in self.config['start_research']:
-            city = self.cities[name]
-            robo.do("research center", "bin", city.name)
-            city.research = True
+            if self.research_centers_in_bin == 0:
+                raise RuntimeError('Not enough research centers for initial setup!')
+            robo.do("research center", "bin", name)
         # Initialize infections.
         self.infection_counter = 0
         self.infection_deck = deque(self.cities.values())
@@ -160,8 +170,8 @@ class World:
         self.players = deque()
         for i in range(num_players):
             name = f'player {i+1}'
-            player = Player(name, self.cities[self.config['start_city']])
-            robo.do(f"player {i+1}", "bin", player.city.name)
+            player = Player(name)
+            robo.do(f"player {i+1}", "bin", self.config['start_city'])
             for j in range(self.config['initial_city_cards'][num_players]):
                 self.draw_player_card(player, gen)
             self.players.append(player)
