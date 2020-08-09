@@ -61,11 +61,14 @@ class Disease:
         self.cured = False
         self.eradicated = False
         self.outbreak_count = 0
+        # Dispatch any moves of our color cubes to our move mehod.
+        robo.listen(self.move, f'{self.color} cube')
 
     def __hash__(self):
         return hash(self.color)
 
-    def move(self, src, dst):
+    def move(self, what, src, dst):
+        assert what == f'{self.color} cube'
         if src == 'bin':
             if self.cubes_remaining == 0:
                 raise RuntimeError(f'GAME OVER: no more {self.name} disease cubes left.')
@@ -73,7 +76,7 @@ class Disease:
             City.find(dst).infections[self] += 1
         elif dst == 'bin':
             self.cubes_remaining += 1
-            City.find(dst).infections[self] -= 1
+            City.find(src).infections[self] -= 1
         else:
             raise RuntimeError('Invalid Disease move from {src} to {dst}.')
 
@@ -82,15 +85,13 @@ class Disease:
             if city.infections[self] == self.outbreak_threshold:
                 self.outbreak(city)
                 break
-            self.move('bin', city.name)
-            #robo.do(f"{self.color} cube", "bin", city.name)
+            robo.do(f"{self.color} cube", "bin", city.name)
 
     def remove(self, city, amount=1):
         for i in range(amount):
             if city.infections[self] == 0: break
             print(f'Treating {city.name}.')
-            self.move(city.name, 'bin')
-            #robo.do(f"{self.color} cube", city.name, "bin")
+            robo.do(f"{self.color} cube", city.name, "bin")
 
     def outbreak(self, city):
         print(f'Outbreak in {city.name}.')
