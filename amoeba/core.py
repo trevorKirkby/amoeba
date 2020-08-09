@@ -18,6 +18,15 @@ class City:
         self.research = False
         self.outbreaking = False
         self.infections = Counter()
+        City._registry[name] = self
+
+    _registry = {}
+
+    @staticmethod
+    def find(name):
+        if name not in City._registry:
+            raise ValueError(f'Got invalid request for unknown city: "{name}".')
+        return City._registry[name]
 
 class Player:
     """A Player object records its current location, player cards and turn progress.
@@ -52,30 +61,36 @@ class Disease:
         self.cured = False
         self.eradicated = False
         self.outbreak_count = 0
-        robo.listen(
-            lambda what, src, dst: print(f"{self.color} got ({what},{src},{dst})"),
-            what=f"{self.color} cube")
 
     def __hash__(self):
         return hash(self.color)
+
+    def move(self, src, dst):
+        if src == 'bin':
+            if self.cubes_remaining == 0:
+                raise RuntimeError(f'GAME OVER: no more {self.name} disease cubes left.')
+            self.cubes_remaining -= 1
+            City.find(dst).infections[self] += 1
+        elif dst == 'bin':
+            self.cubes_remaining += 1
+            City.find(dst).infections[self] -= 1
+        else:
+            raise RuntimeError('Invalid Disease move from {src} to {dst}.')
 
     def infect(self, city, amount=1):
         for i in range(amount):
             if city.infections[self] == self.outbreak_threshold:
                 self.outbreak(city)
                 break
-            if self.cubes_remaining == 0:
-                raise RuntimeError(f'GAME OVER: no more {self.name} disease cubes left.')
-            self.cubes_remaining -= 1
-            robo.do(f"{self.color} cube", "bin", city.name)
-            city.infections[self] += 1
+            self.move('bin', city.name)
+            #robo.do(f"{self.color} cube", "bin", city.name)
 
     def remove(self, city, amount=1):
         for i in range(amount):
             if city.infections[self] == 0: break
             print(f'Treating {city.name}.')
-            self.cubes_remaining += 1
-            city.infections[self] -= 1
+            self.move(city.name, 'bin')
+            #robo.do(f"{self.color} cube", city.name, "bin")
 
     def outbreak(self, city):
         print(f'Outbreak in {city.name}.')
