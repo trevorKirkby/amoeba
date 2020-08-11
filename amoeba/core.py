@@ -3,6 +3,7 @@ import random
 
 from amoeba.abilities import *
 from amoeba.cards import *
+from amoeba.roles.roles_list import roles_list, load_role
 import amoeba.robo as robo
 
 class City:
@@ -16,6 +17,7 @@ class City:
         self.neighbors = []
         self.research = False
         self.outbreaking = False
+        self.quarantined = False
         self.infections = Counter()
         City._registry[name] = self
 
@@ -36,7 +38,14 @@ class Player:
         self.action_count = 0
         self.cards = deque()
         self.actions = [Drive, ShuttleFlight, DirectFlight, CharterFlight, TreatDisease, BuildResearch, ShareKnowledge, DiscoverCure, Ability]
+        self.role_name = 'Ordinary Person'
         robo.listen(self.move, self.name)
+
+    def goto(self, destination): #Because somebody got rid of the old "move" method and then stole the name to use for something else >:[
+        robo.do(self.name, self.city.name, destination.name)
+
+    def begin_turn(self):
+        return
 
     def move(self, what, src, dst):
         assert what == self.name
@@ -47,7 +56,7 @@ class Player:
         if self.city.research:
             city_status.append('research center')
         my_cards = ', '.join([C.name for C in self.cards])
-        return f'in {self.city.name} ({", ".join(city_status)}) with cards: {my_cards}.'
+        return f'the {self.role_name} in {self.city.name} ({", ".join(city_status)}) with cards: {my_cards}.'
 
 class Disease:
     """A Disease object manages the cubes of a single color and is responsible for
@@ -82,6 +91,7 @@ class Disease:
             raise RuntimeError('Invalid Disease move from {src} to {dst}.')
 
     def infect(self, city, amount=1):
+        if city.quarantined: return
         for i in range(amount):
             if city.infections[self] == self.outbreak_threshold:
                 self.outbreak(city)
@@ -141,7 +151,7 @@ class World:
             City.find(src).research = False
 
     def start(self, num_players, num_epidemics, seed):
-        gen = random.Random(seed)
+        self.gen = random.Random(seed)
         if num_players > len(self.config['initial_city_cards']) or self.config['initial_city_cards'][num_players - 1] < 0:
             raise ValueError(f'Invalid number of players: {num_players}.')
         # Define tasks associated with players.
@@ -158,29 +168,31 @@ class World:
         # Initialize infections.
         self.infection_counter = 0
         self.infection_deck = deque(self.cities.values())
-        gen.shuffle(self.infection_deck)
+        self.gen.shuffle(self.infection_deck)
         self.infection_discard = deque()
         for n in self.config['initial_infections']:
             self.draw_infection_card(n)
         # Initialize the player deck.
         self.player_deck = deque([CityCard(city) for city in self.cities.values()])
-        gen.shuffle(self.player_deck)
+        self.gen.shuffle(self.player_deck)
         self.player_discard = deque()
         # Initialize the players.
         self.players = deque()
+        self.gen.shuffle(roles_list)
         for i in range(num_players):
             name = f'player {i+1}'
-            player = Player(name)
+            Role = load_role(roles_list.pop())
+            player = Role(name)
             robo.do(f"player {i+1}", "bin", self.config['start_city'])
             for j in range(self.config['initial_city_cards'][num_players]):
-                self.draw_player_card(player, gen)
+                self.draw_player_card(player)
             self.players.append(player)
         # Initialize epidemics.
         cards_list = list(self.player_deck)
         bucket_size = round(len(cards_list) / num_epidemics)
         buckets = [cards_list[i:i+bucket_size] for i in range(0, len(cards_list), bucket_size)]
         buckets = [bucket+[EpidemicCard()] for bucket in buckets]
-        for bucket in buckets: gen.shuffle(bucket)
+        for bucket in buckets: self.gen.shuffle(bucket)
         self.player_deck = deque([card for bucket in buckets for card in bucket])
         # Start the game.
         self.main_loop()
@@ -193,22 +205,22 @@ class World:
         if sum([disease.outbreak_count for disease in self.diseases.values()]) > self.config['max_outbreaks']:
             raise RuntimeError('GAME OVER: reached max outbreaks.')
 
-    def draw_player_card(self, player, gen):
+    def draw_player_card(self, player):
         card = self.player_deck.pop()
         if not card:
             raise RuntimeError('GAME OVER: no more player cards.')
         if card.type == 'epidemic':
-            self.epidemic(gen)
+            self.epidemic()
             return
         robo.do(card.name + " player card", "player deck", player.name + " hand")
         player.cards.append(card)
 
-    def epidemic(self, gen):
+    def epidemic(self):
         self.infection_counter += 1 #Increase
         target_city = self.infection_deck.popleft() #Infect
         target_city.endemic_disease.infect(target_city, 3)
         self.infection_discard.append(target_city)
-        gen.shuffle(self.infection_discard) #Intensify
+        self.gen.shuffle(self.infection_discard) #Intensify
         self.infection_deck.extend(self.infection_discard)
         self.infection_discard.clear()
 
@@ -224,17 +236,18 @@ class World:
                 user_pick = int(user_pick)
                 if cancel and user_pick == len(pick_from): return 'Cancel'
                 picked = pick_from[user_pick]
-            except (ValueError, KeyError) as e:
+            except (ValueError, IndexError) as e:
                 print('Must be specified as one of the listed numbers.')
         return picked
 
     def player_turn(self, player): #Quick text-based interface for player turns.
         print(f'\n{player.name}\'s turn.')
+        player.begin_turn()
         player.action_count = self.config['actions_per_turn']
         while player.action_count:
             print('You are', player.describe())
             action = self.pick('an action', player.actions)
-            choices = action.choices(player, **self.__dict__) #Actions pretty much happen on a world-level and can view the full world state in order to decide what actions are legal and what isn't.
+            choices = action.choices(player, cards=player.cards, **self.__dict__) #Actions pretty much happen on a world-level and can view the full world state in order to decide what actions are legal and what isn't.
             viable = True
             canceled = False
             chosen = {}
@@ -255,7 +268,7 @@ class World:
             if not viable:
                 print('That action can\'t be taken right now.')
                 continue
-            action.execute(player, **chosen)
+            action.execute(player, cards=player.cards, **chosen)
             player.action_count -= 1
             self.check_win()
         print(f'{player.name} has used all their actions.')
@@ -271,11 +284,12 @@ class World:
 
     def main_loop(self):
         while True:
-            active_player = self.players.pop()
+            active_player = self.players[0]
             self.player_turn(active_player)
             for i in range(self.config['city_cards_per_turn']):
                 self.draw_player_card(active_player)
             self.check_discard(active_player)
             for i in range(self.config['infection_cards_per_turn'][self.infection_counter]):
                 self.draw_infection_card()
-            self.players.appendleft(active_player)
+            self.players.popleft()
+            self.players.append(active_player)

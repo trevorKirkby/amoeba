@@ -20,10 +20,11 @@ class EventCard(PlayerCard):
     def __init__(self, ability):
         super().__init__('event', ability.name)
         self.ability = ability
+        self.reclaimed = False
 
 class Airlift(Ability):
     name = 'Airlift'
-    def choices(self, player, chosen, **kwargs):
-        yield 'destination', [city for city in kwargs['cities'] if city != player.city]
-    def execute(self, player, **kwargs):
-        player.move(kwargs['destination'])
+    def choices(player, cities, **kwargs):
+        yield 'destination',  [city for city in cities if city != player.city]
+    def execute(player, cards, destination):
+        player.move(destination)
