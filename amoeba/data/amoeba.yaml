@@ -26,57 +26,57 @@ research_centers: 6
 
 cities:
   blue:
-    - {"name": "Paris", "country": "FR", "geo": [48.866667, 2.333333], "pop": 2110694}
-    - {"name": "London", "country": "GB", "geo": [51.514125, -0.093689], "pop": 7421228}
-    - {"name": "Atlanta", "country": "US", "geo": [33.7488889, -84.3880556], "pop": 422908}
-    - {"name": "Milan", "country": "IT", "geo": [45.466667, 9.2], "pop": 1156903}
-    - {"name": "Washington", "country": "US", "geo": [38.895, -77.0366667], "pop": 552433}
-    - {"name": "Madrid", "country": "ES", "geo": [40.408566, -3.69222], "pop": 3102644}
-    - {"name": "San Francisco", "country": "US", "geo": [37.775, -122.4183333], "pop": 732072}
-    - {"name": "St. Petersburg", "country": "RU", "geo": [59.894444, 30.264167], "pop": 4039751}
-    - {"name": "Chicago", "country": "US", "geo": [41.85, -87.65], "pop": 2841952}
-    - {"name": "Montréal", "country": "CA", "geo": [45.5, -73.583333], "pop": 3268513}
-    - {"name": "New York", "country": "US", "geo": [40.7141667, -74.0063889], "pop": 8107916}
-    - {"name": "Essen", "country": "DE", "geo": [51.45, 7.016667], "pop": 576914}
+    - {name: Paris, country: FR, geo: [48.866667, 2.333333], pop: 2110694}
+    - {name: London, country: GB, geo: [51.514125, -0.093689], pop: 7421228}
+    - {name: Atlanta, country: US, geo: [33.7488889, -84.3880556], pop: 422908}
+    - {name: Milan, country: IT, geo: [45.466667, 9.2], pop: 1156903}
+    - {name: Washington, country: US, geo: [38.895, -77.0366667], pop: 552433}
+    - {name: Madrid, country: ES, geo: [40.408566, -3.69222], pop: 3102644}
+    - {name: San Francisco, country: US, geo: [37.775, -122.4183333], pop: 732072}
+    - {name: St. Petersburg, country: RU, geo: [59.894444, 30.264167], pop: 4039751}
+    - {name: Chicago, country: US, geo: [41.85, -87.65], pop: 2841952}
+    - {name: Montréal, country: CA, geo: [45.5, -73.583333], pop: 3268513}
+    - {name: New York, country: US, geo: [40.7141667, -74.0063889], pop: 8107916}
+    - {name: Essen, country: DE, geo: [51.45, 7.016667], pop: 576914}
   black:
-    - {"name": "Karachi", "country": "PK", "geo": [24.9056, 67.0822], "pop": 11627378}
-    - {"name": "Cairo", "country": "EG", "geo": [30.05, 31.25], "pop": 7734602}
-    - {"name": "Riyadh", "country": "SA", "geo": [24.653664, 46.71522], "pop": 3469290}
-    - {"name": "Istanbul", "country": "TR", "geo": [41.018611, 28.964722], "pop": 9797536}
-    - {"name": "Kolkata", "country": "IN", "geo": [22.569722, 88.369722], "pop": 4496694}
-    - {"name": "Tehran", "country": "IR", "geo": [35.7106, 51.4935], "pop": 9033000}
-    - {"name": "Chennai", "country": "IN", "geo": [13.083333, 80.283333], "pop": 7088000}
-    - {"name": "Delhi", "country": "IN", "geo": [28.666667, 77.216667], "pop": 10928270}
-    - {"name": "Algiers", "country": "DZ", "geo": [36.7630556, 3.0505556], "pop": 1980242}
-    - {"name": "Baghdad", "country": "IQ", "geo": [33.3386111, 44.3938889], "pop": 5672516}
-    - {"name": "Mumbai", "country": "IN", "geo": [18.975, 72.825833], "pop": 12478447}
-    - {"name": "Moscow", "country": "RU", "geo": [55.752222, 37.615556], "pop": 10381288}
+    - {name: Karachi, country: PK, geo: [24.9056, 67.0822], pop: 11627378}
+    - {name: Cairo, country: EG, geo: [30.05, 31.25], pop: 7734602}
+    - {name: Riyadh, country: SA, geo: [24.653664, 46.71522], pop: 3469290}
+    - {name: Istanbul, country: TR, geo: [41.018611, 28.964722], pop: 9797536}
+    - {name: Kolkata, country: IN, geo: [22.569722, 88.369722], pop: 4496694}
+    - {name: Tehran, country: IR, geo: [35.7106, 51.4935], pop: 9033000}
+    - {name: Chennai, country: IN, geo: [13.083333, 80.283333], pop: 7088000}
+    - {name: Delhi, country: IN, geo: [28.666667, 77.216667], pop: 10928270}
+    - {name: Algiers, country: DZ, geo: [36.7630556, 3.0505556], pop: 1980242}
+    - {name: Baghdad, country: IQ, geo: [33.3386111, 44.3938889], pop: 5672516}
+    - {name: Mumbai, country: IN, geo: [18.975, 72.825833], pop: 12478447}
+    - {name: Moscow, country: RU, geo: [55.752222, 37.615556], pop: 10381288}
   yellow:
-    - {"name": "Khartoum", "country": "SD", "geo": [15.5880556, 32.5341667], "pop": 1974780}
-    - {"name": "São Paulo", "country": "BR", "geo": [-23.473292999999998, -46.665803], "pop": 10021437}
-    - {"name": "Mexico City", "country:": "MX", "geo": [19.432608, -99.133209], "pop": 8918653}
-    - {"name": "Lima", "country": "PE", "geo": [-12.05, -77.05], "pop": 7646786}
-    - {"name": "Miami", "country": "US", "geo": [25.7738889, -80.1938889], "pop": 382894}
-    - {"name": "Bogotá", "country": "CO", "geo": [4.649178, -74.062827], "pop": 7102602}
-    - {"name": "Lagos", "country": "NG", "geo": [6.453056, 3.395833], "pop": 8789133}
-    - {"name": "Johannesburg", "country": "ZA", "geo": [-26.205171, 28.049815], "pop": 2026466}
-    - {"name": "Buenos Aires", "country": "AR", "geo": [-46.589945, -70.929747], "pop": 2891082}
-    - {"name": "Los Angeles", "country": "US", "geo": [34.0522222, -118.2427778], "pop": 3877129}
-    - {"name": "Santiago", "country": "CL", "geo": [-33.45, -70.666667], "pop": 4837248}
-    - {"name": "Kinshasa", "country": "CD", "geo": [-4.3, 15.3], "pop": 7787832}
+    - {name: Khartoum, country: SD, geo: [15.5880556, 32.5341667], pop: 1974780}
+    - {name: São Paulo, country: BR, geo: [-23.473292999999998, -46.665803], pop: 10021437}
+    - {name: Mexico City, country: MX, geo: [19.432608, -99.133209], pop: 8918653}
+    - {name: Lima, country: PE, geo: [-12.05, -77.05], pop: 7646786}
+    - {name: Miami, country: US, geo: [25.7738889, -80.1938889], pop: 382894}
+    - {name: Bogotá, country: CO, geo: [4.649178, -74.062827], pop: 7102602}
+    - {name: Lagos, country: NG, geo: [6.453056, 3.395833], pop: 8789133}
+    - {name: Johannesburg, country: ZA, geo: [-26.205171, 28.049815], pop: 2026466}
+    - {name: Buenos Aires, country: AR, geo: [-46.589945, -70.929747], pop: 2891082}
+    - {name: Los Angeles, country: US, geo: [34.0522222, -118.2427778], pop: 3877129}
+    - {name: Santiago, country: CL, geo: [-33.45, -70.666667], pop: 4837248}
+    - {name: Kinshasa, country: CD, geo: [-4.3, 15.3], pop: 7787832}
   red:
-    - {"name": "Beijing", "country": "CN", "geo": [39.928889, 116.388333], "pop": 21542000}
-    - {"name": "Jakarta", "country": "ID", "geo": [-6.174444, 106.829444], "pop": 8540306}
-    - {"name": "Manila", "country": "PH", "geo": [14.6042, 120.9822], "pop": 10443877}
-    - {"name": "Seoul", "country": "KR", "geo": [37.5985, 126.9783], "pop": 10323448}
-    - {"name": "Hong Kong", "country": "HK", "geo": [22.2833333, 114.15], "pop": 7500700}
-    - {"name": "Osaka", "country": "JP", "geo": [34.516855, 135.562978], "pop": 57170}
-    - {"name": "Ho Chi Minh City", "country": "VN", "geo": [10.75, 106.666667], "pop": 3467426}
-    - {"name": "Shanghai", "country": "CN", "geo": [31.045556, 121.399722], "pop": 14608512}
-    - {"name": "Taipei", "country": "TW", "geo": [25.0391667, 121.525], "pop": 2514794}
-    - {"name": "Bangkok", "country": "CN", "geo": [13.736717, 100.523186], "pop": 8305218}
-    - {"name": "Tokyo", "country": "JP", "geo": [35.685, 139.751389], "pop": 31480498}
-    - {"name": "Sydney", "country": "AU", "geo": [-33.861481, 151.205475], "pop": 4394585}
+    - {name: Beijing, country: CN, geo: [39.928889, 116.388333], pop: 21542000}
+    - {name: Jakarta, country: ID, geo: [-6.174444, 106.829444], pop: 8540306}
+    - {name: Manila, country: PH, geo: [14.6042, 120.9822], pop: 10443877}
+    - {name: Seoul, country: KR, geo: [37.5985, 126.9783], pop: 10323448}
+    - {name: Hong Kong, country: HK, geo: [22.2833333, 114.15], pop: 7500700}
+    - {name: Osaka, country: JP, geo: [34.516855, 135.562978], pop: 57170}
+    - {name: Ho Chi Minh City, country: VN, geo: [10.75, 106.666667], pop: 3467426}
+    - {name: Shanghai, country: CN, geo: [31.045556, 121.399722], pop: 14608512}
+    - {name: Taipei, country: TW, geo: [25.0391667, 121.525], pop: 2514794}
+    - {name: Bangkok, country: CN, geo: [13.736717, 100.523186], pop: 8305218}
+    - {name: Tokyo, country: JP, geo: [35.685, 139.751389], pop: 31480498}
+    - {name: Sydney, country: AU, geo: [-33.861481, 151.205475], pop: 4394585}
 
 edges:
   - [San Francisco, Los Angeles]
