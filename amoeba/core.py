@@ -10,16 +10,17 @@ class City:
     """A City object records the cubes, players and research centers at its location,
     and knows what other cities it is connected to.
     """
-    def __init__(self, name, population, endemic_disease):
-        self.name = name
+    def __init__(self, data, endemic_disease):
+        self.name = data["name"]
+        self.geopoint = data["geo"]
+        self.population = data["pop"]
         self.endemic_disease = endemic_disease
-        self.population = population
         self.neighbors = []
         self.research = False
         self.outbreaking = False
         self.quarantined = False
         self.infections = Counter()
-        City._registry[name] = self
+        City._registry[self.name] = self
 
     _registry = {}
 
@@ -123,8 +124,9 @@ class World:
         for color in config["cities"]:
             self.diseases[color] = Disease(color, config['cubes_per_color'], config['outbreak_threshold'])
             robo.enable(color + " cube", "bin")
-            for name in config["cities"][color]:
-                self.cities[name] = City(name, 0, self.diseases[color])
+            for citydata in config["cities"][color]:
+                city = City(citydata, self.diseases[color])
+                self.cities[city.name] = city
         self.research_centers_in_bin = config["research_centers"]
         robo.enable("research center", "bin")
         for city in self.cities:
